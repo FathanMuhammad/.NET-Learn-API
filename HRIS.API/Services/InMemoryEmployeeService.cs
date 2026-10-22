@@ -36,7 +36,7 @@ public class InMemoryEmployeeService : IEmployeeService
         CancellationToken ct = default)
     {
         employee.Id = Guid.CreateVersion7();
-        employee.CreatedAt = _timeProvider.GetUtcNow();
+        //employee.CreatedAt = _timeProvider.GetUtcNow();
         _employees.TryAdd(employee.Id, employee);
         return Task.FromResult(employee);
     }

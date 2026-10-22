@@ -4,7 +4,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddHrisServices();
+builder.Services.AddHrisServices(builder.Configuration);
+//builder.Services.AddMiddleware();
+//builder.Services.AddDbContext();
 
 builder.Services.AddCors(options =>
 {
