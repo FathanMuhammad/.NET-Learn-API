@@ -6,8 +6,8 @@ public static class MiddlewareExtensions
 {
     public static IServiceCollection AddHrisMiddlewares(this IServiceCollection services)
     {
-        services.AddTransient<RequestTimingMiddleware>();
-        services.AddTransient<MaintenanceModeMidleware>();
+        services.AddSingleton<RequestTimingMiddleware>();       //Middleware kalo bisa singleton karena ga perlu diinstansiasi berkali2, cukup 1 instance aja
+        services.AddSingleton<MaintenanceModeMiddleware>();
         return services;
     }
 
@@ -15,5 +15,5 @@ public static class MiddlewareExtensions
         => builder.UseMiddleware<RequestTimingMiddleware>();
 
     public static IApplicationBuilder UseMaintenanceMode(this IApplicationBuilder builder)
-        => builder.UseMiddleware<MaintenanceModeMidleware>();
+        => builder.UseMiddleware<MaintenanceModeMiddleware>();
 }

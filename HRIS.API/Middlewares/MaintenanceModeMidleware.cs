@@ -2,7 +2,7 @@
 
 namespace HRIS.API.Middlewares;
 
-public class MaintenanceModeMidleware(IConfiguration configuration) : IMiddleware
+public class MaintenanceModeMiddleware(IConfiguration configuration) : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
