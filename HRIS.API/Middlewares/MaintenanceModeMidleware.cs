@@ -15,6 +15,7 @@ public class MaintenanceModeMidleware(IConfiguration configuration) : IMiddlewar
                 .WriteAsync("The application is currently under maintenance. Please try again later.");
             return;
         }
-            await next(context);
+        
+        await next(context);
     }
 }

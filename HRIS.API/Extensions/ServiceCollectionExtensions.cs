@@ -1,4 +1,4 @@
-﻿
+
 using HRIS.API.Services;
 
 namespace HRIS.API.Extensions;
@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IEmployeeService, InMemoryEmployeeService>();
         services.AddSingleton(TimeProvider.System);
+        services.AddHrisMiddlewares();
 
         return services;
     }
