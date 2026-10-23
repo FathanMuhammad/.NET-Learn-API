@@ -1,5 +1,13 @@
-﻿namespace HRIS.API.Data.Repositories;
+﻿using System.Linq.Expressions;
 
-public interface IRepository
+namespace YourProject.Domain.Interfaces;
+
+public interface IRepository<TEntity> where TEntity : class
 {
+    Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IReadOnlyCollection<TEntity>> GetAllAsync(CancellationToken ct = default);
+    Task<IReadOnlyCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+    Task AddAsync(TEntity entity, CancellationToken ct = default);
+    void Update(TEntity entity);
+    void Delete(TEntity entity);
 }
