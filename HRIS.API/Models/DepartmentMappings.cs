@@ -1,3 +1,4 @@
+
 using HRIS.API.Entities;
 
 namespace HRIS.API.Models;
@@ -13,3 +14,21 @@ public static class DepartmentMappings
             department.ParentDepartment?.Name
         );
 }
+
+//using HRIS.API.Entities;
+
+//namespace HRIS.API.Models;
+
+//public static class DepartmentMappings
+//{
+//    public static DepartmentResponse ToResponse(
+//        this Department department,
+//        string? departmentName) =>
+//        new(
+//            department.Id,
+//            department.Code,
+//            department.Name,
+//            department.ParentDepartmentId,
+//            department.ParentDepartment?.Name
+//        );
+//}

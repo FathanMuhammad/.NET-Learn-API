@@ -1,4 +1,4 @@
-﻿using HRIS.API.Data;
+using HRIS.API.Data;
 using HRIS.API.Entities;
 using HRIS.API.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,17 +8,27 @@ namespace HRIS.API.Services;
 public class EFEmployeeService(HrisDbContext context, TimeProvider timeProvider) : IEmployeeService
 {
     public async Task<IReadOnlyCollection<EmployeeResponse>> GetAllAsync(CancellationToken ct = default)
-        => await context.Employees
-            .AsNoTracking() // read-only: karena tidak ada perubahan tracking yang dibutuhkan
-            .OrderBy(e => e.FullName)
-            .Select(e => e.ToResponse())
-            .ToListAsync(ct);
+        => await context.Employees // DbSet<Employee>
+            .AsNoTracking() // IQueryable<Employee>
+            .OrderBy(e => e.FullName) // IOrderedQueryable<Employee>
+            .Select(e => e.ToResponse(
+                e.Department.Name,
+                e.Position.Title,
+                managerFullName: e.Manager != null
+                    ? e.Manager.FullName
+                    : null)) // IQueryable<EmployeeResponse>
+            .ToListAsync(ct); // Task<List<...>>
 
     public async Task<EmployeeResponse?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        => await context.Employees
+        => await context.Employees // DbSet<Employee>
             .AsNoTracking()
-            .Where(e => e.Id == id)
-            .Select(e => e.ToResponse())
+            .Where(e => e.Id == id) // IQueryable<Employee>
+            .Select(e => e.ToResponse(
+                e.Department.Name,
+                e.Position.Title,
+                managerFullName: e.Manager != null
+                    ? e.Manager.FullName
+                    : null)) // IQueryable<EmployeeResponse>
             .FirstOrDefaultAsync(ct);
 
     public async Task<Guid> CreateAsync(CreateEmployeeRequest request, CancellationToken ct = default)
