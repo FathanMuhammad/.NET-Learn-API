@@ -1,5 +1,6 @@
 using Azure;
 using HRIS.API.Data;
+using HRIS.API.Data.Repositories;
 using HRIS.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Operation = HRIS.API.Services.Operation;
@@ -16,6 +17,7 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<HrisDbContext>(options =>
             options.UseSqlServer(connectionString));
 
+
         services.AddScoped<IEmployeeService, EFEmployeeService>();
         services.AddSingleton(TimeProvider.System);
 
@@ -23,6 +25,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IScopedOperation, Operation>();         // one instance per HTTP request
         services.AddSingleton<ISingletonOperation, Operation>();   // one instance for the application
         services.AddScoped<OperationReport>();                     // helper 
+        
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+        services.AddScoped<IPositionRepository, PositionRepository>();
 
         return services;
     }

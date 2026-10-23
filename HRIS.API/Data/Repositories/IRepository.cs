@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
-namespace YourProject.Domain.Interfaces;
+namespace HRIS.API.Data.Repositories;
 
 public interface IRepository<TEntity> where TEntity : class
 {
@@ -10,4 +10,5 @@ public interface IRepository<TEntity> where TEntity : class
     Task AddAsync(TEntity entity, CancellationToken ct = default);
     void Update(TEntity entity);
     void Delete(TEntity entity);
+    Task<int> SaveChangesAsync(CancellationToken ct = default);
 }

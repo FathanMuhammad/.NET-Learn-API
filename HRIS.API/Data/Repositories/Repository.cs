@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using YourProject.Domain.Interfaces;
 
 namespace HRIS.API.Data.Repositories;
 
@@ -25,5 +24,8 @@ public class Repository<TEntity>(HrisDbContext context) : IRepository<TEntity> w
         => Set.Update(entity);
 
     public void Delete(TEntity entity)
-        => Set.Update(entity);
+        => Set.Remove(entity);
+
+    public async Task<int> SaveChangesAsync(CancellationToken ct = default)
+        => await Context.SaveChangesAsync(ct);
 }   

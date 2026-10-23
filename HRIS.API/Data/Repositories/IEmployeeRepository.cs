@@ -1,6 +1,5 @@
 ﻿using HRIS.API.Entities;
 using HRIS.API.Models;
-using YourProject.Domain.Interfaces;
 
 namespace HRIS.API.Data.Repositories;
 

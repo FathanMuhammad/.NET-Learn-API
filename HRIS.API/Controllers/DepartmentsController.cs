@@ -1,37 +1,25 @@
-using HRIS.API.Data;
+using HRIS.API.Data.Repositories;
 using HRIS.API.Entities;
 using HRIS.API.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace HRIS.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DepartmentsController(HrisDbContext context) : ControllerBase
+public class DepartmentsController(IDepartmentRepository departmentRepository) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DepartmentResponse>>> GetAll(CancellationToken ct)
-    {
-        var departments = await context.Departments
-            .AsNoTracking()
-            .Include(d => d.ParentDepartment)
-            .ToListAsync(ct);
-
-        return Ok(departments.Select(d => d.ToResponse()));
-    }
+        => Ok(await departmentRepository.GetResponseAsync(ct));
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<DepartmentResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
     {
-        var department = await context.Departments
-            .AsNoTracking()
-            .Include(d => d.ParentDepartment)
-            .FirstOrDefaultAsync(d => d.Id == id, ct);
-
+        var department = await departmentRepository.GetResponseByIdAsync(id, ct);
         return department is null
             ? NotFound()
-            : Ok(department.ToResponse());
+            : Ok(department);
     }
 
     [HttpPost]
@@ -41,10 +29,8 @@ public class DepartmentsController(HrisDbContext context) : ControllerBase
     {
         if (request.ParentDepartmentId.HasValue)
         {
-            var parentExists = await context.Departments
-                .AnyAsync(d => d.Id == request.ParentDepartmentId.Value, ct);
-
-            if (!parentExists)
+            var parent = await departmentRepository.GetByIdAsync(request.ParentDepartmentId.Value, ct);
+            if (parent is null)
             {
                 return BadRequest($"Parent department with Id '{request.ParentDepartmentId.Value}' was not found.");
             }
@@ -58,19 +44,14 @@ public class DepartmentsController(HrisDbContext context) : ControllerBase
             ParentDepartmentId = request.ParentDepartmentId
         };
 
-        context.Departments.Add(department);
-        await context.SaveChangesAsync(ct);
+        await departmentRepository.AddAsync(department, ct);
+        await departmentRepository.SaveChangesAsync(ct);
 
-        if (department.ParentDepartmentId.HasValue)
-        {
-            await context.Entry(department)
-                .Reference(d => d.ParentDepartment)
-                .LoadAsync(ct);
-        }
+        var response = await departmentRepository.GetResponseByIdAsync(department.Id, ct);
 
         return CreatedAtAction(
             nameof(GetById),
             new { id = department.Id },
-            department.ToResponse());
+            response);
     }
 }
