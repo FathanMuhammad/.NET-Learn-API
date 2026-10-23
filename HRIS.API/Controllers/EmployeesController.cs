@@ -44,14 +44,11 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
 
     [HttpPost("{id:guid}/terminate")]
     public async Task<IActionResult> Terminate([FromRoute] Guid id, CancellationToken ct)
-    {
-        var result = await employeeService.TerminateAsync(id, ct);
-        return result switch
-        {
-            TerminateResult.Terminated => NoContent(),
-            TerminateResult.NotFound => NotFound(),
-            TerminateResult.AlreadyTerminated => Conflict("Employee is already terminated."),
-            _ => BadRequest()
-        };
-    }
+        => await employeeService.TerminateAsync(id, ct)
+            switch
+            {
+                TerminateResult.Terminated => NoContent(),
+                TerminateResult.AlreadyTerminated => Conflict(),
+                _ => NotFound()
+            };
 }
