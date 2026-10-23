@@ -1,11 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿using HRIS.API.Entities;
 
 namespace HRIS.API.Models;
 
-public static class  EmployeeMappings
+public static class EmployeeMappings
 {
-public static EmployeeResponse ToResponse(CallConvThiscall Employee employee) => 
-        new(employee.Id, employee.FullName, employee.EmployeeNumber, employee.Email, employee.HireDate, employee.CreatedAt)
-    
+    public static EmployeeResponse ToResponse(this Employee employee) =>
+        new(employee.Id, employee.FullName, employee.Email, employee.HireDate, employee.CreatedAt);
 }
-    

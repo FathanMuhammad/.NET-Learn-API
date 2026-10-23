@@ -13,35 +13,32 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .HasMaxLength(20)
             .IsRequired();
         builder.Property(e => e.FullName)
-            .HasMaxLength(150)
+            .HasMaxLength(100)
             .IsRequired();
         builder.Property(e => e.Email)
             .HasMaxLength(256)
             .IsRequired();
         builder.Property(e => e.EmployeeStatus)
-            .HasMaxLength(20)
             .HasConversion<string>()
-            .HasDefaultValue(EmployeeStatus.Active)
+            .HasMaxLength(20)
+            // .HasDefaultValue(EmployeeStatus.Active)
             .IsRequired();
 
         builder.HasIndex(e => e.EmployeeNumber)
             .IsUnique();
-
         builder.HasIndex(e => e.Email)
             .IsUnique();
 
         builder.HasOne(e => e.Department)
-            .WithMany(e => e.Employees)
+            .WithMany(d => d.Employees)
             .HasForeignKey(e => e.DepartmentId)
             .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasOne(e => e.Position)
-            .WithMany(e => e.Employees)
+            .WithMany(p => p.Employees)
             .HasForeignKey(e => e.PositionId)
             .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasOne(e => e.Manager)
-            .WithMany(e => e.Employees)
+            .WithMany(m => m.DirectReports)
             .HasForeignKey(e => e.ManagerId)
             .OnDelete(DeleteBehavior.Restrict);
     }

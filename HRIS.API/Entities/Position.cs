@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace HRIS.API.Entities;
+﻿namespace HRIS.API.Entities;
 
 public class Position
 {

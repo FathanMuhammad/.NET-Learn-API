@@ -2,25 +2,19 @@ using HRIS.API.Entities;
 using HRIS.API.Models;
 using HRIS.API.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 
 namespace HRIS.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EmployeeController : ControllerBase
+public class EmployeesController(IEmployeeService employeeService) : ControllerBase
 {
-    private readonly IEmployeeService _employeeService;
-
-    public EmployeeController(IEmployeeService employeeService)
-    {
-        _employeeService = employeeService;
-    }
+    private readonly IEmployeeService? _employeeService = employeeService;
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Employee>>> GetAll(
-       [FromQuery] string? name,
-       CancellationToken ct)
+    public async Task<ActionResult<IEnumerable<EmployeeResponse>>> GetAll(
+        [FromQuery] string? name,
+        CancellationToken ct)
     {
         var employees = await _employeeService.GetAllAsync(ct);
         if (!string.IsNullOrWhiteSpace(name))
@@ -30,26 +24,21 @@ public class EmployeeController : ControllerBase
                 .ToList();
         }
 
-
-
-        return Ok(employees.ToResponse);
-
-        //mapping selecet<EmployeeResponse> to return only the required fields
+        return Ok(employees.Select(e => e.ToResponse()));
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<Employee>> GetById(
+    public async Task<ActionResult<EmployeeResponse>> GetById(
         [FromRoute] Guid id,
         CancellationToken ct)
     {
         var employee = await _employeeService.GetByIdAsync(id, ct);
-
         if (employee is null)
         {
             return NotFound();
         }
 
-        return Ok(employee);
+        return Ok(employee.ToResponse());
     }
 
     [HttpPost]
@@ -65,12 +54,8 @@ public class EmployeeController : ControllerBase
             HireDate = request.HireDate
         };
 
-        var created = await _employeeService.CreateAsync(employee, ct);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = created.Id },
-            created);
+        await _employeeService.CreateAsync(employee, ct);
+        return CreatedAtAction(nameof(GetById), new { id = employee.Id }, employee);
     }
 
     [HttpPut("{id:guid}")]
@@ -81,25 +66,20 @@ public class EmployeeController : ControllerBase
     {
         var employee = new Employee
         {
-            Id = id,
+            EmployeeNumber = request.EmployeeNumber,
             FullName = request.FullName,
             Email = request.Email,
-            EmployeeNumber = request.EmployeeNumber,
             HireDate = request.HireDate
         };
 
         var updated = await _employeeService.UpdateAsync(id, employee, ct);
-
         return updated ? NoContent() : NotFound();
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(
-        [FromRoute] Guid id,
-        CancellationToken ct)
+    public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
     {
         var deleted = await _employeeService.DeleteAsync(id, ct);
-
         return deleted ? NoContent() : NotFound();
     }
 }

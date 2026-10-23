@@ -5,8 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddHrisServices(builder.Configuration);
-//builder.Services.AddMiddleware();
-//builder.Services.AddDbContext();
+builder.Services.AddMiddleware();
 
 builder.Services.AddCors(options =>
 {
@@ -30,6 +29,7 @@ builder.Services.AddOpenApi();
 var app = builder.Build();
 
 app.UseRequestTiming();
+
 app.UseMaintenanceMode();
 
 // Configure the HTTP request pipeline.
