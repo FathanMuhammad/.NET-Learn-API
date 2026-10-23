@@ -30,16 +30,21 @@ namespace HRIS.API.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<Guid?>("ParentDepartmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
 
                     b.HasIndex("ParentDepartmentId");
 
@@ -51,6 +56,9 @@ namespace HRIS.API.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("DepartmentId")
                         .HasColumnType("uniqueidentifier");
@@ -67,15 +75,13 @@ namespace HRIS.API.Migrations
 
                     b.Property<string>("EmployeeStatus")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("Active");
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateOnly>("HireDate")
                         .HasColumnType("date");
@@ -126,13 +132,34 @@ namespace HRIS.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Positions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("01a166be-ee55-747c-b090-69f7572f26e8"),
+                            Level = 2,
+                            Title = "Staff"
+                        },
+                        new
+                        {
+                            Id = new Guid("01a166be-ee55-747c-b090-6c3b9bd9cd5c"),
+                            Level = 5,
+                            Title = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = new Guid("01a166be-ee55-747c-b090-72cbd94cb9f2"),
+                            Level = 8,
+                            Title = "Department Head"
+                        });
                 });
 
             modelBuilder.Entity("HRIS.API.Entities.Department", b =>
                 {
                     b.HasOne("HRIS.API.Entities.Department", "ParentDepartment")
                         .WithMany("SubDepartments")
-                        .HasForeignKey("ParentDepartmentId");
+                        .HasForeignKey("ParentDepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ParentDepartment");
                 });
@@ -146,7 +173,7 @@ namespace HRIS.API.Migrations
                         .IsRequired();
 
                     b.HasOne("HRIS.API.Entities.Employee", "Manager")
-                        .WithMany("Employees")
+                        .WithMany("DirectReports")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Restrict);
 
@@ -172,7 +199,7 @@ namespace HRIS.API.Migrations
 
             modelBuilder.Entity("HRIS.API.Entities.Employee", b =>
                 {
-                    b.Navigation("Employees");
+                    b.Navigation("DirectReports");
                 });
 
             modelBuilder.Entity("HRIS.API.Entities.Position", b =>
