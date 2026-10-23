@@ -25,8 +25,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IScopedOperation, Operation>();         // one instance per HTTP request
         services.AddSingleton<ISingletonOperation, Operation>();   // one instance for the application
         services.AddScoped<OperationReport>();                     // helper 
-        
+
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
         services.AddScoped<IPositionRepository, PositionRepository>();
