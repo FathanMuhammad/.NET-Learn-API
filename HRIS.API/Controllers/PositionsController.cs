@@ -1,5 +1,4 @@
 using HRIS.API.Data;
-using HRIS.API.Entities;
 using HRIS.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,48 +7,23 @@ namespace HRIS.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PositionsController(HrisDbContext context) : ControllerBase
+public class PositionsController(HrisDbContext db) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PositionResponse>>> GetAll(CancellationToken ct)
-    {
-        var positions = await context.Positions
+    public async Task<ActionResult<IReadOnlyCollection<PositionResponse>>> GetAll(CancellationToken ct)
+        => Ok(await db.Positions
             .AsNoTracking()
-            .ToListAsync(ct);
-
-        return Ok(positions.Select(p => p.ToResponse()));
-    }
-
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<PositionResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
-    {
-        var position = await context.Positions
-            .AsNoTracking()
-            .FirstOrDefaultAsync(p => p.Id == id, ct);
-
-        return position is null
-            ? NotFound()
-            : Ok(position.ToResponse());
-    }
+            .OrderByDescending(p => p.Level).ThenBy(p => p.Title)
+            .Select(p => p.ToResponse())
+            .ToListAsync(ct));
 
     [HttpPost]
-    public async Task<ActionResult<PositionResponse>> Create(
-        [FromBody] CreatePositionRequest request,
-        CancellationToken ct)
+    public async Task<IActionResult> Create([FromBody] CreatePositionRequest request, CancellationToken ct)
     {
-        var position = new Position
-        {
-            Id = Guid.CreateVersion7(),
-            Title = request.Title,
-            Level = request.Level
-        };
+        var position = request.ToEntity();
+        db.Positions.Add(position);
+        await db.SaveChangesAsync(ct);
 
-        context.Positions.Add(position);
-        await context.SaveChangesAsync(ct);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = position.Id },
-            position.ToResponse());
+        return Created($"/api/positions/{position.Id}", new { id = position.Id });
     }
 }
