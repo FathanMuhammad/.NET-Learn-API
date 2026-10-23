@@ -14,7 +14,7 @@ public class Employee
     public string FullName { get; set; } = null!;
     public string Email { get; set; } = null!;
     public DateOnly HireDate { get; set; }
-    public EmployeeStatus EmployeeStatus { get; set; } = EmployeeStatus.Active;
+    public EmployeeStatus EmployeeStatus { get; set; }
     //public DateOnly CreatedAt { get; set; }
     public DateOnly? TerminatedAt { get; set; }
     
@@ -26,7 +26,7 @@ public class Employee
     // Relationships 
     public Department Department { get; set; } = null!;
     public Position Position { get; set; } = null!;
-    public Employee Manager { get; set; } = null!;
+    public Employee? Manager { get; set; }
     public ICollection<Employee> Employees { get; set; } = [];
 
     /*   tambahkan CreatedAt ke entah service/controller

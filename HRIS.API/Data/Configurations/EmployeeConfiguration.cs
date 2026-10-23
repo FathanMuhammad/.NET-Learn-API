@@ -13,13 +13,15 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
             .HasMaxLength(20)
             .IsRequired();
         builder.Property(e => e.FullName)
-            .HasMaxLength(100)
+            .HasMaxLength(150)
             .IsRequired();
         builder.Property(e => e.Email)
             .HasMaxLength(256)
             .IsRequired();
         builder.Property(e => e.EmployeeStatus)
-            .HasMaxLength(100)
+            .HasMaxLength(20)
+            .HasConversion<string>()
+            .HasDefaultValue(EmployeeStatus.Active)
             .IsRequired();
 
         builder.HasIndex(e => e.EmployeeNumber)

@@ -1,4 +1,4 @@
-namespace HRIS.API.Entities;
+namespace HRIS.API.Models;
 
 public class EmployeeDto
 {

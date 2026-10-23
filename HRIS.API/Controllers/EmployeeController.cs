@@ -1,4 +1,5 @@
 using HRIS.API.Entities;
+using HRIS.API.Models;
 using HRIS.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -29,7 +30,11 @@ public class EmployeeController : ControllerBase
                 .ToList();
         }
 
-        return Ok(employees);
+
+
+        return Ok(employees.ToResponse);
+
+        //mapping selecet<EmployeeResponse> to return only the required fields
     }
 
     [HttpGet("{id:guid}")]

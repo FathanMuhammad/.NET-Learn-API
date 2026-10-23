@@ -34,17 +34,27 @@ namespace HRIS.API.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "FullName",
                 table: "Employees",
-                type: "nvarchar(100)",
-                maxLength: 100,
+                type: "nvarchar(150)",
+                maxLength: 150,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
 
             migrationBuilder.AlterColumn<string>(
+                name: "EmployeeStatus",
+                table: "Employees",
+                type: "nvarchar(20)",
+                maxLength: 20,
+                nullable: false,
+                defaultValue: "Active",
+                oldClrType: typeof(int),
+                oldType: "int");
+
+            migrationBuilder.AlterColumn<string>(
                 name: "EmployeeNumber",
                 table: "Employees",
                 type: "nvarchar(20)",
-                maxLength: 100,
+                maxLength: 20,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
@@ -52,8 +62,8 @@ namespace HRIS.API.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
                 table: "Employees",
-                type: "nvarchar(100)",
-                maxLength: 100,
+                type: "nvarchar(256)",
+                maxLength: 256,
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(max)");
@@ -143,8 +153,18 @@ namespace HRIS.API.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(100)",
-                oldMaxLength: 100);
+                oldType: "nvarchar(150)",
+                oldMaxLength: 150);
+
+            migrationBuilder.AlterColumn<int>(
+                name: "EmployeeStatus",
+                table: "Employees",
+                type: "int",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(20)",
+                oldMaxLength: 20,
+                oldDefaultValue: "Active");
 
             migrationBuilder.AlterColumn<string>(
                 name: "EmployeeNumber",
@@ -152,8 +172,8 @@ namespace HRIS.API.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(100)",
-                oldMaxLength: 100);
+                oldType: "nvarchar(20)",
+                oldMaxLength: 20);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Email",
@@ -161,8 +181,8 @@ namespace HRIS.API.Migrations
                 type: "nvarchar(max)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(100)",
-                oldMaxLength: 100);
+                oldType: "nvarchar(256)",
+                oldMaxLength: 256);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Employees_Departments_DepartmentId",
