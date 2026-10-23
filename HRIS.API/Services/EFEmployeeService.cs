@@ -48,112 +48,30 @@ public class EFEmployeeService(IUnitOfWork uow, TimeProvider timeProvider) : IEm
         return true;
     }
 
-    public Task<TerminateResult> TerminateAsync(Guid id, CancellationToken ct = default)
+    public async Task<TerminateResult> TerminateAsync(Guid id, CancellationToken ct = default)
     {
+        // 1. check employee if exist (using id)
+        var employee = await uow.Employees.GetByIdAsync(id, ct);
+        if (employee is null)
+            return TerminateResult.NotFound;
 
+        if (employee.EmployeeStatus == EmployeeStatus.Terminated)
+            return TerminateResult.AlreadyTerminated;
+
+        // 2. change status(Terminated) & catat waktu terminate nya (TerminatedAt)
+        employee.EmployeeStatus = EmployeeStatus.Terminated;
+        employee.TerminatedAt = DateOnly.FromDateTime(timeProvider.GetUtcNow().DateTime);
+
+        // 3. memperbaiki every direct report moves up to terminated employee manager | may be null, direct report itu naik keatas, contoh atasan resign, otomatis atasan ganti ke yg atas
+        var directReports = await uow.Employees.GetDirectReportsAsync(employee.Id, ct);
+        foreach (var report in directReports)
+        {
+            report.ManagerId = employee.ManagerId;
+        }
+
+        // 4. save changes employee
+        await uow.SaveChangesAsync(ct);
+
+        return TerminateResult.Terminated;
     }
 }
-
-//public class EFEmployeeService(HrisDbContext context, TimeProvider timeProvider) : IEmployeeService
-//{
-//    public async Task<IReadOnlyCollection<EmployeeResponse>> GetAllAsync(CancellationToken ct = default)
-//        => await context.Employees // DbSet<Employee>
-//            .AsNoTracking() // IQueryable<Employee>
-//            .OrderBy(e => e.FullName) // IOrderedQueryable<Employee>
-//            .Select(e => e.ToResponse(
-//                e.Department.Name,
-//                e.Position.Title,
-//                managerFullName: e.Manager != null
-//                    ? e.Manager.FullName
-//                    : null)) // IQueryable<EmployeeResponse>
-//            .ToListAsync(ct); // Task<List<...>>
-
-//    public async Task<EmployeeResponse?> GetByIdAsync(Guid id, CancellationToken ct = default)
-//        => await context.Employees // DbSet<Employee>
-//            .AsNoTracking()
-//            .Where(e => e.Id == id) // IQueryable<Employee>
-//            .Select(e => e.ToResponse(
-//                e.Department.Name,
-//                e.Position.Title,
-//                managerFullName: e.Manager != null
-//                    ? e.Manager.FullName
-//                    : null)) // IQueryable<EmployeeResponse>
-//            .FirstOrDefaultAsync(ct);
-
-//    public async Task<Guid> CreateAsync(CreateEmployeeRequest request, CancellationToken ct = default)
-//    {
-//        var employee = new Employee
-//        {
-//            Id = Guid.CreateVersion7(),
-//            EmployeeNumber = request.EmployeeNumber,
-//            FullName = request.FullName,
-//            Email = request.Email.ToLowerInvariant(),
-//            HireDate = request.HireDate,
-//            CreatedAt = timeProvider.GetUtcNow(),
-//            DepartmentId = request.DepartmentId,
-//            PositionId = request.PositionId,
-//            ManagerId = request.ManagerId
-//        };
-
-//        context.Employees.Add(employee); // state
-//        await context.SaveChangesAsync(ct);
-
-//        return employee.Id;
-//    }
-
-//    public async Task<bool> UpdateAsync(Guid id, UpdateEmployeeRequest request, CancellationToken ct = default)
-//    {
-//        var employee = await context.Employees.FindAsync([id], ct);
-//        if (employee is null)
-//            return false;
-
-//        employee.FullName = request.FullName;
-//        employee.DepartmentId = request.DepartmentId;
-//        employee.PositionId = request.PositionId;
-//        employee.ManagerId = request.ManagerId;
-
-//        await context.SaveChangesAsync(ct);
-//        return true;
-//    }
-
-//    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
-//    {
-//        var employee = await context.Employees.FindAsync([id], ct);
-//        if (employee is null)
-//            return false;
-
-//        context.Employees.Remove(employee);
-//        await context.SaveChangesAsync(ct);
-//        return true;
-//    }
-
-//    Task<IReadOnlyCollection<EmployeeResponse>> IEmployeeService.GetAllAsync(CancellationToken ct)
-//    {
-//        throw new NotImplementedException();
-//    }
-
-//    Task<EmployeeResponse?> IEmployeeService.GetByIdAsync(Guid id, CancellationToken ct)
-//    {
-//        throw new NotImplementedException();
-//    }
-
-//    Task<Guid> IEmployeeService.CreateAsync(CreateEmployeeRequest request, CancellationToken ct)
-//    {
-//        throw new NotImplementedException();
-//    }
-
-//    Task<bool> IEmployeeService.UpdateAsync(Guid id, UpdateEmployeeRequest request, CancellationToken ct)
-//    {
-//        throw new NotImplementedException();
-//    }
-
-//    Task<bool> IEmployeeService.DeleteAsync(Guid id, CancellationToken ct)
-//    {
-//        throw new NotImplementedException();
-//    }
-
-//    Task<TerminateResult> IEmployeeService.TerminateAsync(Guid id, CancellationToken ct)
-//    {
-//        throw new NotImplementedException();
-//    }
-//}

@@ -8,6 +8,37 @@ public enum EmployeeStatus
 
 public class Employee
 {
+    public Employee()
+    {
+    }
+
+    // 2. Parameterized constructor (11 argumen) untuk dipanggil oleh EmployeeMappings.ToEntity
+    public Employee(
+        Guid id,
+        string employeeNumber,
+        string fullName,
+        string email,
+        DateOnly hireDate,
+        DateTimeOffset createdAt,
+        EmployeeStatus employeeStatus,
+        DateOnly? terminatedAt,
+        Guid departmentId,
+        Guid positionId,
+        Guid? managerId)
+    {
+        Id = id;
+        EmployeeNumber = employeeNumber;
+        FullName = fullName;
+        Email = email;
+        HireDate = hireDate;
+        CreatedAt = createdAt;
+        EmployeeStatus = employeeStatus;
+        TerminatedAt = terminatedAt;
+        DepartmentId = departmentId;
+        PositionId = positionId;
+        ManagerId = managerId;
+    }
+
     public Guid Id { get; set; }
     public string EmployeeNumber { get; set; } = null!;
     public string FullName { get; set; } = null!;
@@ -16,6 +47,7 @@ public class Employee
     public DateTimeOffset CreatedAt { get; set; }
     public EmployeeStatus EmployeeStatus { get; set; } = EmployeeStatus.Active;
     public DateOnly? TerminatedAt { get; set; }
+
     // Foreign Keys
     public Guid DepartmentId { get; set; }
     public Guid PositionId { get; set; }
