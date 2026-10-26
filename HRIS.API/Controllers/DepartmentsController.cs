@@ -1,5 +1,6 @@
 using HRIS.API.Features.Departments.Commands.CreateDepartment;
 using HRIS.API.Features.Departments.Queries.GetDepartments;
+using HRIS.API.Features.Departments.Queries.GetDepartmentTree;
 using HRIS.API.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,10 @@ public class DepartmentsController(ISender sender) : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IReadOnlyCollection<DepartmentResponse>>> GetAll(CancellationToken ct)
         => Ok(await sender.Send(new GetDepartmentsQuery(), ct));
+
+    [HttpGet("tree")]
+    public async Task<ActionResult<IReadOnlyCollection<DepartmentTreeDto>>> GetTree(CancellationToken ct)
+        => Ok(await sender.Send(new GetDepartmentTreeQuery(), ct));
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateDepartmentRequest request, CancellationToken ct)
