@@ -1,4 +1,4 @@
-﻿using HRIS.API.Entities;
+using HRIS.API.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
