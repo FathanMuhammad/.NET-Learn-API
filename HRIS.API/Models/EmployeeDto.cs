@@ -30,5 +30,6 @@ public record EmployeeResponse(
     string DepartmentName,
     string PositionTitle,
     string? ManagerName,
-    DateTimeOffset CreatedAt
-);
+    DateTimeOffset CreatedAt);
+
+public record AssignManagerRequest(Guid? ManagerId);   // null = no manager
