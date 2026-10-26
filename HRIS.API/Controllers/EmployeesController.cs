@@ -27,7 +27,8 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     public async Task<ActionResult<EmployeeResponse>> Create([FromBody] CreateEmployeeRequest request, CancellationToken ct)
     {
         var id = await employeeService.CreateAsync(request, ct);
-        return CreatedAtAction(nameof(GetById), new { id }, new { id });
+        var employee = await employeeService.GetByIdAsync(id, ct);
+        return CreatedAtAction(nameof(GetById), new { id }, employee);
     }
 
     [HttpPut("{id:guid}")]
@@ -46,9 +47,9 @@ public class EmployeesController(IEmployeeService employeeService) : ControllerB
     public async Task<IActionResult> Terminate([FromRoute] Guid id, CancellationToken ct)
         => await employeeService.TerminateAsync(id, ct)
             switch
-            {
-                TerminateResult.Terminated => NoContent(),
-                TerminateResult.AlreadyTerminated => Conflict(),
-                _ => NotFound()
-            };
+        {
+            TerminateResult.Terminated => NoContent(),
+            TerminateResult.AlreadyTerminated => Conflict(),
+            _ => NotFound()
+        };
 }

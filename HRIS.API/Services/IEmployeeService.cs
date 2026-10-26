@@ -1,4 +1,4 @@
-﻿using HRIS.API.Entities;
+using HRIS.API.Entities;
 using HRIS.API.Models;
 
 namespace HRIS.API.Services;
@@ -16,6 +16,6 @@ public interface IEmployeeService
 public enum TerminateResult
 {
     Terminated,
-    NotFound,
-    AlreadyTerminated
+    NotFound, 
+    AlreadyTerminated 
 }

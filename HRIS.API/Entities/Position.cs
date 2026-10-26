@@ -9,10 +9,7 @@ public class Position
         Level = level;
     }
 
-    public Position()
-    {
-
-    }
+    public Position() { }
 
     public Guid Id { get; set; }
     public string Title { get; set; } = null!;

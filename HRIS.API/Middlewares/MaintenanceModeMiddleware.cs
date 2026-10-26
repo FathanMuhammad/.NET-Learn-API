@@ -1,4 +1,4 @@
-﻿namespace HRIS.API.Middlewares;
+namespace HRIS.API.Middlewares;
 
 public class MaintenanceModeMiddleware(IConfiguration configuration) : IMiddleware
 {
@@ -10,10 +10,10 @@ public class MaintenanceModeMiddleware(IConfiguration configuration) : IMiddlewa
             await context
                 .Response
                 .WriteAsync("The service is currently under maintenance. Please try again later.");
-
+            
             return;
         }
-
+        
         await next(context);
     }
 }

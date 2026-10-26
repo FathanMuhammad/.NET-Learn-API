@@ -6,15 +6,13 @@ namespace HRIS.API.Data.Repositories;
 
 public class DepartmentRepository(HrisDbContext context) : Repository<Department>(context), IDepartmentRepository
 {
-    private IQueryable<DepartmentResponse> Responses()
-        => Context.Departments
+    public async Task<IReadOnlyCollection<DepartmentResponse>> GetResponsesAsync(CancellationToken ct = default)
+        => await Context.Departments
             .AsNoTracking()
-            .Include(d => d.ParentDepartment)
-            .Select(d => d.ToResponse());
-
-    public async Task<IReadOnlyCollection<DepartmentResponse>> GetResponseAsync(CancellationToken ct = default)
-        => await Responses().ToListAsync(ct);
-
-    public async Task<DepartmentResponse?> GetResponseByIdAsync(Guid id, CancellationToken ct = default)
-        => await Responses().FirstOrDefaultAsync(d => d.Id == id, ct);
+            .OrderBy(d => d.Code)
+            .Select(d => d.ToResponse(
+                d.ParentDepartment != null
+                    ? d.ParentDepartment.Name
+                    : null))
+            .ToListAsync(ct);
 }

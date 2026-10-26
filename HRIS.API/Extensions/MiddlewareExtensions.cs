@@ -10,10 +10,10 @@ public static class MiddlewareExtensions
         services.AddSingleton<MaintenanceModeMiddleware>();
         return services;
     }
-
-    public static IApplicationBuilder UseRequestTiming(this IApplicationBuilder builder)
+    
+    public static IApplicationBuilder UseRequestTiming(this IApplicationBuilder builder) 
         => builder.UseMiddleware<RequestTimingMiddleware>();
-
-    public static IApplicationBuilder UseMaintenanceMode(this IApplicationBuilder builder)
+    
+    public static IApplicationBuilder UseMaintenanceMode(this IApplicationBuilder builder) 
         => builder.UseMiddleware<MaintenanceModeMiddleware>();
 }

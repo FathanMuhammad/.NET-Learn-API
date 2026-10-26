@@ -5,6 +5,5 @@ namespace HRIS.API.Data.Repositories;
 
 public interface IDepartmentRepository : IRepository<Department>
 {
-    Task<IReadOnlyCollection<DepartmentResponse>> GetResponseAsync(CancellationToken ct = default);
-    Task<DepartmentResponse?> GetResponseByIdAsync(Guid id, CancellationToken ct = default);
+    Task<IReadOnlyCollection<DepartmentResponse>> GetResponsesAsync(CancellationToken ct = default);
 }

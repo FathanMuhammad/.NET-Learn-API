@@ -9,6 +9,5 @@ public interface IRepository<TEntity> where TEntity : class
     Task<IReadOnlyCollection<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
     Task AddAsync(TEntity entity, CancellationToken ct = default);
     void Update(TEntity entity);
-    void Delete(TEntity entity);
-    Task<int> SaveChangesAsync(CancellationToken ct = default);
+    void Remove(TEntity entity);
 }

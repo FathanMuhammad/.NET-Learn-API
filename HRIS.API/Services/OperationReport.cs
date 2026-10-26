@@ -1,4 +1,4 @@
-﻿namespace HRIS.API.Services;
+namespace HRIS.API.Services;
 
 public class OperationReport(
     ITransientOperation transient,

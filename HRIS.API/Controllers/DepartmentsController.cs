@@ -1,57 +1,39 @@
-using HRIS.API.Data.Repositories;
+using HRIS.API.Data;
 using HRIS.API.Entities;
 using HRIS.API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRIS.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DepartmentsController(IDepartmentRepository departmentRepository) : ControllerBase
+public class DepartmentsController(HrisDbContext db) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<DepartmentResponse>>> GetAll(CancellationToken ct)
-        => Ok(await departmentRepository.GetResponseAsync(ct));
-
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<DepartmentResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
-    {
-        var department = await departmentRepository.GetResponseByIdAsync(id, ct);
-        return department is null
-            ? NotFound()
-            : Ok(department);
-    }
+    public async Task<ActionResult<IReadOnlyCollection<DepartmentResponse>>> GetAll(CancellationToken ct)
+        => Ok(await db.Departments
+            .AsNoTracking()
+            .OrderBy(d => d.Code)
+            .Select(d => d.ToResponse(
+                d.ParentDepartment != null
+                ? d.ParentDepartment.Name
+                : null))
+            .ToListAsync(ct));
 
     [HttpPost]
-    public async Task<ActionResult<DepartmentResponse>> Create(
-        [FromBody] CreateDepartmentRequest request,
-        CancellationToken ct)
+    public async Task<IActionResult> Create([FromBody] CreateDepartmentRequest request, CancellationToken ct)
     {
-        if (request.ParentDepartmentId.HasValue)
-        {
-            var parent = await departmentRepository.GetByIdAsync(request.ParentDepartmentId.Value, ct);
-            if (parent is null)
-            {
-                return BadRequest($"Parent department with Id '{request.ParentDepartmentId.Value}' was not found.");
-            }
-        }
-
         var department = new Department
         {
             Id = Guid.CreateVersion7(),
-            Code = request.Code,
-            Name = request.Name,
+            Code = request.Code.Trim().ToUpperInvariant(),
+            Name = request.Name.Trim(),
             ParentDepartmentId = request.ParentDepartmentId
         };
 
-        await departmentRepository.AddAsync(department, ct);
-        await departmentRepository.SaveChangesAsync(ct);
-
-        var response = await departmentRepository.GetResponseByIdAsync(department.Id, ct);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = department.Id },
-            response);
+        db.Departments.Add(department);
+        await db.SaveChangesAsync(ct);
+        return Created($"/api/departments/{department.Id}", new { id = department.Id });
     }
 }

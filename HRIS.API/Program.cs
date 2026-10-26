@@ -1,6 +1,6 @@
-using HRIS.API.Extensions;
-using HRIS.API.Services;
 using System.Text.Json.Serialization;
+using HRIS.API.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,21 +14,15 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.AllowAnyHeader()  //Mengizinkan semua jenis HTTP Request Header yang dikirim oleh klien.
-              .AllowAnyMethod() //Mengizinkan semua jenis HTTP Method(Verb).
-              .AllowAnyOrigin();  //Mengizinkan semua asal domain untuk mengakses API Anda.
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowAnyOrigin();
     });
 });
 
-// Register OpenAPI services.
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-/*
- * Pipeline
- * Ketika hit run, akan dijalankan app ini
- * akan cek apakah env nya dev dengan if IsDev....
- * 
- */
 var app = builder.Build();
 
 app.UseRequestTiming();
@@ -38,19 +32,14 @@ app.UseMaintenanceMode();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Generate OpenAPI document at /openapi/v1.json
     app.MapOpenApi();
-
-    // Configure Swagger UI to read the OpenAPI document.
     app.UseSwaggerUI(options =>
     {
-        options.ConfigObject.AdditionalItems["layout"] = "BaseLayout";
-        options.SwaggerEndpoint(
-            "/openapi/v1.json","HRIS API");
+        options.SwaggerEndpoint("/openapi/v1.json", "HRIS API");
     });
 }
 
-app.UseHttpsRedirection(); // app.Use ini adalah middleware yang diproses pipeline sblm app run
+app.UseHttpsRedirection();
 
 app.UseCors();
 
@@ -59,9 +48,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
-//app.Run(async context =>
-//{
-//    Console.WriteLine("Middleware 3: Terminal - handling request");
-//    await context.Response.WriteAsync("Hello Word");
-//});
