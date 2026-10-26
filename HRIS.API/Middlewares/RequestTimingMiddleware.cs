@@ -25,7 +25,7 @@ public class RequestTimingMiddleware(ILogger<RequestTimingMiddleware> logger) : 
         }
 
         stopwatch.Stop();
-        logger.LogInformation("{Method} {Path} responded {StatusCode} in {ElapsedTime} ms", 
+        logger.LogDebug("{Method} {Path} responded {StatusCode} in {ElapsedTime} ms", 
             context.Request.Method, 
             context.Request.Path, 
             context.Response.StatusCode, 
