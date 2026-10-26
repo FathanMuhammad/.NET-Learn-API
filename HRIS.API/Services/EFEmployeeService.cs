@@ -1,8 +1,6 @@
-using HRIS.API.Data;
 using HRIS.API.Data.Repositories;
 using HRIS.API.Entities;
 using HRIS.API.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace HRIS.API.Services;
 
@@ -19,7 +17,7 @@ public class EfEmployeeService(IUnitOfWork uow, TimeProvider timeProvider, ILogg
         var employee = request.ToEntity(
             timeProvider.GetUtcNow(),
             EmployeeStatus.Active
-            );
+        );
         
         await uow.Employees.AddAsync(employee, ct);
         await uow.SaveChangesAsync(ct);
