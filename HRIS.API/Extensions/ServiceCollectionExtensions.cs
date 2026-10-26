@@ -1,6 +1,7 @@
 using HRIS.API.Data;
 using HRIS.API.Data.Repositories;
 using HRIS.API.Services;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRIS.API.Extensions;
@@ -11,6 +12,9 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Module 6: MediatR scans this assembly for handlers
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());
+
         var connectionString = configuration.GetConnectionString("HrisDB");
         services.AddDbContext<HrisDbContext>(options => 
             options.UseSqlServer(connectionString));

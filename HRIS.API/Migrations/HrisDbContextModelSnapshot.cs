@@ -48,7 +48,7 @@ namespace HRIS.API.Migrations
 
                     b.HasIndex("ParentDepartmentId");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("HRIS.API.Entities.Employee", b =>
@@ -109,7 +109,7 @@ namespace HRIS.API.Migrations
 
                     b.HasIndex("PositionId");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("HRIS.API.Entities.Position", b =>
@@ -131,7 +131,7 @@ namespace HRIS.API.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Positions");
+                    b.ToTable("Positions", (string)null);
 
                     b.HasData(
                         new
