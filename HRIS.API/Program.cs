@@ -15,7 +15,12 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     builder.AddHrisSerilog();
-    builder.Services.AddControllers()
+    builder.Services.AddControllers(options =>
+        {
+            // Without this, MVC adds an implicit [Required] to every non-nullable string and answers with its own 400 format
+            // BEFORE FluentValidation runs. With it, FluentValidation is the only place that rejects missing values.
+            options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+        })
         .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     builder.Services.AddHrisServices(builder.Configuration);
     builder.Services.AddMiddleware();
@@ -35,7 +40,8 @@ try
     var app = builder.Build();
 
     app.UseRequestTiming();
-    app.UseHrisRequestLogging();                      // one structured line per request
+    app.UseHrisRequestLogging();                      // one structured line per request, OUTSIDE the exception handler
+    app.UseExceptionHandler();                        // turns every exception below it into a ProblemDetails response
     app.UseMaintenanceMode();
 
     if (app.Environment.IsDevelopment())

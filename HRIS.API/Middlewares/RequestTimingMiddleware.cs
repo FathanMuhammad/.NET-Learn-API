@@ -17,7 +17,16 @@ public class RequestTimingMiddleware(ILogger<RequestTimingMiddleware> logger) : 
             correlationId = Guid.NewGuid().ToString();
         }
         
-        context.Response.Headers["X-Correlation-Id"] = correlationId;
+        context.Response.Headers[_correlationHeader] = correlationId;
+
+        // Module 7: UseExceptionHandler clears the response headers before it writes an error response.
+        // Keep the id in Items and put the header back right before the response starts.
+        context.Items[_correlationHeader] = correlationId;
+        context.Response.OnStarting(() =>
+        {
+            context.Response.Headers[_correlationHeader] = correlationId;
+            return Task.CompletedTask;
+        });
 
         using (logger.BeginScope("CorrelationId: {CorrelationId}", correlationId))
         {

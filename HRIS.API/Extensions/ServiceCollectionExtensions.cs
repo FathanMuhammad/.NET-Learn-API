@@ -1,8 +1,11 @@
+using FluentValidation;
 using HRIS.API.Common.Behaviors;
+using HRIS.API.Common.ExceptionHandlers;
 using HRIS.API.Data;
 using HRIS.API.Data.Repositories;
 using HRIS.API.Services;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace HRIS.API.Extensions;
@@ -13,6 +16,29 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        // Module 7: ProblemDetails and Exception Handling
+        services.AddProblemDetails(options => options.CustomizeProblemDetails = context =>
+        {
+            var problem = context.ProblemDetails;
+            problem.Instance ??= context.HttpContext.Request.Path.Value;
+
+            // The exception handler has already cleared the response headers, so read the id from Items (Step 5).
+            if (context.HttpContext.Items.TryGetValue("X-Correlation-Id", out var correlationId))
+            {
+                problem.Extensions["correlationId"] = correlationId?.ToString();
+            }
+
+            // A 400 that MVC wrote itself (broken JSON, "abc" for a Guid) is not a FluentValidation failure.
+            if (problem is ValidationProblemDetails && !problem.Extensions.ContainsKey(ProblemDetailsWriter.ErrorCodeKey))
+            {
+                problem.Extensions[ProblemDetailsWriter.ErrorCodeKey] = "MALFORMED_REQUEST";
+            }
+        });
+        services.AddExceptionHandler<GlobalExceptionHandler>();   // Lesson 3 adds two more BEFORE this line
+
+        // Module 7: FluentValidation
+        services.AddValidatorsFromAssembly(typeof(Program).Assembly);   // every AbstractValidator<T> in this project becomes IValidator<T>
+
         // Module 6: MediatR scans this assembly for handlers
         services.AddMediatR(cfg =>
         {
