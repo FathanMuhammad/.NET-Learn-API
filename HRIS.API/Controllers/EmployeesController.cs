@@ -5,6 +5,7 @@ using HRIS.API.Features.Employees.Commands.CreateEmployee;
 using HRIS.API.Features.Employees.Commands.DeleteEmployee;
 using HRIS.API.Features.Employees.Commands.TerminateEmployee;
 using HRIS.API.Features.Employees.Commands.UpdateEmployee;
+using HRIS.API.Features.Employees.Queries.GetDirectReports;
 using HRIS.API.Features.Employees.Queries.GetEmployeeById;
 using HRIS.API.Features.Employees.Queries.GetEmployees;
 using HRIS.API.Models;
@@ -29,6 +30,10 @@ public class EmployeesController(ISender sender) : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<EmployeeResponse>> GetById([FromRoute] Guid id, CancellationToken ct)
         => await sender.Send(new GetEmployeeByIdQuery(id), ct) is { } employee ? Ok(employee) : NotFound();
+
+    [HttpGet("{id:guid}/direct-reports")]
+    public async Task<ActionResult<IReadOnlyCollection<EmployeeListDto>>> GetDirectReports([FromRoute] Guid id, CancellationToken ct)
+        => Ok(await sender.Send(new GetDirectReportsQuery(id), ct));
 
     [HttpPost]
     [ProducesResponseType<EmployeeResponse>(StatusCodes.Status201Created)]
