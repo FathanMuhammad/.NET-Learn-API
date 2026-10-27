@@ -34,16 +34,21 @@ public static class ServiceCollectionExtensions
                 problem.Extensions[ProblemDetailsWriter.ErrorCodeKey] = "MALFORMED_REQUEST";
             }
         });
-        services.AddExceptionHandler<GlobalExceptionHandler>();   // Lesson 3 adds two more BEFORE this line
+
+        // The framework calls the handlers in registration order, and the first one that returns true wins.
+        services.AddExceptionHandler<ValidationExceptionHandler>();
+        services.AddExceptionHandler<DomainExceptionHandler>();
+        services.AddExceptionHandler<GlobalExceptionHandler>();   // fallback, always last
 
         // Module 7: FluentValidation
         services.AddValidatorsFromAssembly(typeof(Program).Assembly);   // every AbstractValidator<T> in this project becomes IValidator<T>
 
-        // Module 6: MediatR scans this assembly for handlers
+        // Module 6 & 7: MediatR scans this assembly for handlers and registers pipeline behaviors in execution order
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssemblyContaining<Program>();
             cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));   // Module 7
         });
 
         var connectionString = configuration.GetConnectionString("HrisDB");
