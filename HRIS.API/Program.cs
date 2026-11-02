@@ -23,6 +23,7 @@ try
         })
         .AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
     builder.Services.AddHrisServices(builder.Configuration);
+    builder.Services.AddHrisSecurity();   // Module 10, after AddHrisServices
     builder.Services.AddMiddleware();
 
     builder.Services.AddCors(options =>
@@ -48,22 +49,23 @@ try
     {
         app.MapOpenApi();                             // /openapi/v1.json
         app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "HRIS API"));
+        await app.SeedBootstrapAdminAsync();
     }
 
     app.UseHttpsRedirection();
     app.UseCors();
+    app.UseAuthentication();              // BEFORE UseAuthorization
 
-    app.Use(async (context, next) =>                  // every log line written while this request runs carries a UserId
+    app.Use(async (context, next) =>
     {
         var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous";
         using (Serilog.Context.LogContext.PushProperty("UserId", userId))
-        {
             await next(context);
-        }
     });
 
     app.UseAuthorization();
     app.MapControllers();
+
 
     await app.RunAsync();
 }
