@@ -5,6 +5,7 @@ using HRIS.API.Common;
 using HRIS.API.Data;
 using HRIS.API.Data.Repositories;
 using HRIS.API.Services;
+using HRIS.API.Services.Email;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -51,6 +52,10 @@ public static class ServiceCollectionExtensions
             cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));   // Module 7
         });
+
+        // Module 9: email
+        services.Configure<MailSettings>(configuration.GetSection(MailSettings.SectionName));
+        services.AddTransient<IEmailService, MailKitEmailService>();
 
         var connectionString = configuration.GetConnectionString("HrisDB");
         services.AddDbContext<HrisDbContext>(options => 
