@@ -47,7 +47,7 @@ try
 
     if (app.Environment.IsDevelopment())
     {
-        app.MapOpenApi();                             // /openapi/v1.json
+        app.MapOpenApi().AllowAnonymous();                // /openapi/v1.json
         app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "HRIS API"));
         await app.SeedBootstrapAdminAsync();
     }
