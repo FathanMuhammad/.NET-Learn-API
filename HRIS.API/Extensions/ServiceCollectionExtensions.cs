@@ -1,6 +1,7 @@
 using FluentValidation;
 using HRIS.API.Common.Behaviors;
 using HRIS.API.Common.ExceptionHandlers;
+using HRIS.API.Common;
 using HRIS.API.Data;
 using HRIS.API.Data.Repositories;
 using HRIS.API.Services;
@@ -56,6 +57,7 @@ public static class ServiceCollectionExtensions
             options.UseSqlServer(connectionString));
         
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<EmployeePolicy>();   // Module 8: business rules as a plain class
         
         services.AddTransient<ITransientOperation, Operation>();   // a new instance for every injection
         services.AddScoped<IScopedOperation, Operation>();         // one instance per HTTP request
