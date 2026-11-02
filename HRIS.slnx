@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/tests/">
+    <Project Path="tests/HRIS.API.Tests/HRIS.API.Tests.csproj" />
+  </Folder>
   <Project Path="HRIS.API/HRIS.API.csproj" />
 </Solution>
