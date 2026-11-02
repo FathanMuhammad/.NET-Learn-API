@@ -55,6 +55,10 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
         builder.HasIndex(e => e.Email)
             .IsUnique();
 
+        builder.HasOne(e => e.User)
+       .WithOne()
+       .HasForeignKey<Employee>(e => e.UserId)
+       .OnDelete(DeleteBehavior.Restrict);   // EF adds a filtered unique index on UserId (IS NOT NULL)
         builder.HasOne(e => e.Department)
             .WithMany(d => d.Employees)
             .HasForeignKey(e => e.DepartmentId)
